@@ -45,6 +45,33 @@ def selectKey(seed):
         #midiKeySig.append(midiKeySig[value] -24)
     return midiKeySig
 
+def selectTempo():
+    print("What should this music be for?")
+    print("Overworld, Dungeon(exploration), Main Theme, Dungeon(combat), Overworld (Combat)")
+    selection = input()
+    match selection.lower():
+        case "overworld":
+            randomTempo = random.randint(120,140)
+            print(randomTempo)
+            print("overworld")
+        case "dungeon(exploration)":
+            randomTempo = random.randint(70,80)
+            print(randomTempo)
+            print("dungeon1")
+        case "dungeon(combat)":
+            randomTempo = random.randint(80,100)
+            print(randomTempo)
+            print("dungeon2")
+        case "main theme":
+            randomTempo = random.randint(100,130)
+            print(randomTempo)
+            print("main theme")
+        case "overworld(combat)":
+            randomTempo = random.randint(200,360)
+            print(randomTempo)
+            print("combat")
+    return randomTempo
+
 
 def randomMelody(selectedMidiKey):
     mf = MIDIFile(2)     # only 1 track
@@ -92,21 +119,21 @@ def printToScore(melody,selectedMidiKey,num,selectedTempo):
     channel = 0
     volume = 100
 
-    mf.addNote(1,channel,selectedMidiKey[1],0,4,volume)
-    mf.addNote(1,channel,selectedMidiKey[0 + 3],0,4,volume)
-    mf.addNote(1,channel,selectedMidiKey[0 + 3 + 3],0,4,volume)
+    mf.addNote(1,channel,selectedMidiKey[1],0,4,int(volume/2))
+    mf.addNote(1,channel,selectedMidiKey[0 + 3],0,4,int(volume/2))
+    mf.addNote(1,channel,selectedMidiKey[0 + 3 + 3],0,4,int(volume/2))
     for i in range(len(melody)):
         if (melody[i] != "REST"):
             mf.addNote(track,channel,melody[i],i,1,volume)
     
     for i in range(4,100,4):
         chordChoice = random.randint(1,6)
-        mf.addNote(1,channel,selectedMidiKey[chordChoice],i,4,volume)
-        mf.addNote(1,channel,selectedMidiKey[(chordChoice+3) %8],i,4,volume)
-        mf.addNote(1,channel,selectedMidiKey[(chordChoice+3 +3) %8],i,4,volume)
-    mf.addNote(1,channel,selectedMidiKey[0],100,4,volume)
-    mf.addNote(1,channel,selectedMidiKey[0 + 3],100,4,volume)
-    mf.addNote(1,channel,selectedMidiKey[(0 + 3 + 3) % 8],100,4,volume)
+        mf.addNote(1,channel,selectedMidiKey[chordChoice],i,4,int(volume/2))
+        mf.addNote(1,channel,selectedMidiKey[(chordChoice+3) %8],i,4,int(volume/2))
+        mf.addNote(1,channel,selectedMidiKey[(chordChoice+3 +3) %8],i,4,int(volume/2))
+    mf.addNote(1,channel,selectedMidiKey[0],100,4,int(volume/2))
+    mf.addNote(1,channel,selectedMidiKey[0 + 3],100,4,int(volume/2))
+    mf.addNote(1,channel,selectedMidiKey[(0 + 3 + 3) % 8],100,4,int(volume/2))
     with open("outputTEST"+str(num)+".mid", 'wb') as outf:
         mf.writeFile(outf)
             
@@ -160,6 +187,11 @@ def melodyRules(melody,notes,add):
     for i in range(1, len(melody)):
         if melody[i - 1] == notes[-2] and melody[i] == notes[0]:
             score += 1
+
+    if melody[0] == notes[0]:
+        score += 20
+    if melody[-1] == notes[0]:
+        score += 20
     
     if score >= (4 * add):
         return  True
@@ -169,7 +201,8 @@ def melodyRules(melody,notes,add):
 seed = str(random_seed(10))
 
 selec = selectKey(seed)
-tempo = random.randint(180,300)
+tempo = selectTempo()
+
 melody = randomMelody(selec)
 while (not melodyRules(melody,selec,0)):
         mutate(melody,selec)
