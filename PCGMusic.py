@@ -12,7 +12,7 @@ notes = ['C','C#','D','D#',
          'E','F','F#','G',
          'G#','A','A#','B',]
 
-keyPattern = [2,2,1,2,2,2,1]
+
 
 
 def random_seed(length):
@@ -21,7 +21,14 @@ def random_seed(length):
     max = 9*min + (min-1)
     return random.randint(min, max)
 
-def selectKey(seed):
+def selectKey(seed,pattern):
+    keyPatternMajor = [2,2,1,2,2,2,1]
+    keyPatternMinor =  [2, 1, 2, 2, 1, 2, 2]
+    match pattern:
+        case "major":
+            keyPattern = keyPatternMajor
+        case "minor":
+            keyPattern = keyPatternMinor
     selectedKeySig = []
     midiKeySig = []
     print( "Your Random Generated Seed is " + seed) 
@@ -49,28 +56,24 @@ def selectTempo():
     print("What should this music be for?")
     print("Overworld, Dungeon(exploration), Main Theme, Dungeon(combat), Overworld (Combat)")
     selection = input()
+    key = ""
     match selection.lower():
         case "overworld":
             randomTempo = random.randint(120,140)
-            print(randomTempo)
-            print("overworld")
+            key = "major"
         case "dungeon(exploration)":
             randomTempo = random.randint(70,80)
-            print(randomTempo)
-            print("dungeon1")
+            key = "minor"
         case "dungeon(combat)":
-            randomTempo = random.randint(80,100)
-            print(randomTempo)
-            print("dungeon2")
+            randomTempo = random.randint(200,360)
+            key = "minor"
         case "main theme":
             randomTempo = random.randint(100,130)
-            print(randomTempo)
-            print("main theme")
+            key = "major"
         case "overworld(combat)":
             randomTempo = random.randint(200,360)
-            print(randomTempo)
-            print("combat")
-    return randomTempo
+            key = "major"
+    return randomTempo,key
 
 
 def randomMelody(selectedMidiKey):
@@ -200,8 +203,9 @@ def melodyRules(melody,notes,add):
 
 seed = str(random_seed(10))
 
-selec = selectKey(seed)
-tempo = selectTempo()
+
+tempo,pattern = selectTempo()
+selec = selectKey(seed,pattern)
 
 melody = randomMelody(selec)
 while (not melodyRules(melody,selec,0)):
